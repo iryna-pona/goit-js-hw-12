@@ -11,8 +11,14 @@ import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
 const form = document.querySelector('.form');
+const loadMoreBtn = document.querySelector('.load-more-btn');
+
+let currentQuery = '';
+let currentPage = 1;
+let totalHits = 0;
 
 form.addEventListener('submit', onSearch);
+loadMoreBtn.addEventListener('click', onLoadMore);
 
 async function onSearch(event) {
   event.preventDefault();
@@ -25,11 +31,15 @@ async function onSearch(event) {
     return;
   }
 
+  currentQuery = query;
+  currentPage = 1;
   clearGallery();
   showLoader();
 
   try {
-    const data = await getImagesByQuery(query);
+    const data = await getImagesByQuery(currentQuery, currentPage);
+    totalHits = data.totalHits;
+
     if (!data.hits.length) {
       iziToast.info({
         position: 'topRight',
@@ -44,7 +54,12 @@ async function onSearch(event) {
       });
       return;
     }
+
     createGallery(data.hits);
+
+    if (data.totalHits > data.hits.length) {
+      showLoadMoreButton();
+    }
   } catch (error) {
     iziToast.error({
       position: 'topRight',
@@ -59,6 +74,48 @@ async function onSearch(event) {
   } finally {
     hideLoader();
     input.value = '';
-    showLoadMoreButton();
+  }
+}
+
+async function onLoadMore() {
+  currentPage += 1;
+  showLoader();
+
+  try {
+    const data = await getImagesByQuery(currentQuery, currentPage);
+    createGallery(data.hits);
+
+    const { height: cardHeight } = document
+      .querySelector('.gallery')
+      .firstElementChild.getBoundingClientRect();
+
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: 'smooth',
+    });
+
+    const loadedImages = document.querySelectorAll('.gallery-item').length;
+    if (loadedImages >= totalHits) {
+      hideLoadMoreButton();
+      iziToast.info({
+        position: 'topRight',
+        message: "We're sorry, but you've reached the end of search results.",
+        backgroundColor: '#ef4040',
+        messageColor: '#fff',
+        timeout: 4000,
+        maxWidth: 432,
+      });
+    }
+  } catch (error) {
+    iziToast.error({
+      position: 'topRight',
+      message: 'Something went wrong',
+      backgroundColor: '#ef4040',
+      messageColor: '#fff',
+      timeout: 5000,
+      maxWidth: 432,
+    });
+  } finally {
+    hideLoader();
   }
 }
