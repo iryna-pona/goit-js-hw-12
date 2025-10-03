@@ -1,4 +1,4 @@
-import { getImagesByQuery } from './js/pixabay-api.js';
+import { getImagesByQuery, per_page } from './js/pixabay-api.js';
 import {
   createGallery,
   clearGallery,
@@ -57,7 +57,7 @@ async function onSearch(event) {
 
     createGallery(data.hits);
 
-    if (totalHits > data.hits.length) {
+    if (currentPage * per_page < totalHits) {
       showLoadMoreButton();
     }
   } catch (error) {
@@ -79,6 +79,7 @@ async function onSearch(event) {
 
 async function onLoadMore() {
   currentPage += 1;
+  loadMoreBtn.disabled = true;
   showLoader('bottom');
 
   try {
@@ -96,8 +97,7 @@ async function onLoadMore() {
       });
     }
 
-    const loadedImages = document.querySelectorAll('.gallery-item').length;
-    if (loadedImages >= totalHits) {
+    if (currentPage * per_page >= totalHits) {
       hideLoadMoreButton();
       iziToast.info({
         position: 'topRight',
@@ -119,5 +119,6 @@ async function onLoadMore() {
     });
   } finally {
     hideLoader();
+    loadMoreBtn.disabled = false;
   }
 }

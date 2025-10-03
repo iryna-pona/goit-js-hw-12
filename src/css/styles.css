@@ -1,19 +1,11 @@
-/**
-  |============================
-  | include css partials with
-  | default @import url()
-  |============================
-*/
+
 /* Common styles */
 @import url('./reset.css');
 @import url('./base.css');
 
-/* Loader */
 
-.loader-wrapper {
-  text-align: center;
-  margin-top: 32px;
-}
+
+/* Loader */
 
 .loader {
   display: none;
@@ -25,7 +17,17 @@
 }
 
 .loader.is-visible {
-  display: inline-block;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.loader[data-position="top"] {
+  margin-top: 32px;
+}
+
+.loader[data-position="bottom"] {
+  margin-bottom: 32px;
 }
 
 .loader::before,
@@ -75,6 +77,36 @@
   100% {
     clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 0);
   }
+}
+
+/* load-more-btn */
+
+.load-more-btn {
+  display: none;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  width: 125px;
+  height: 40px;
+  background-color: #4e75ff;
+  
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 150%;
+  letter-spacing: 0.04em;
+  color: #fff;
+  
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.load-more-btn.is-visible {
+  display: block;
+  margin: 32px auto;
+}
+
+.load-more-btn:hover {
+  background-color: #6c8cff;
 }
 
 /* Form */
@@ -181,7 +213,7 @@ body .sl-overlay {
 .stats {
   display: flex;
   justify-content: space-around;
-  gap: 16px;
+  gap: 10px;
   list-style: none;
   padding: 10px;
   margin: 0;
