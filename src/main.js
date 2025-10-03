@@ -34,7 +34,7 @@ async function onSearch(event) {
   currentQuery = query;
   currentPage = 1;
   clearGallery();
-  showLoader();
+  showLoader('top');
 
   try {
     const data = await getImagesByQuery(currentQuery, currentPage);
@@ -57,7 +57,7 @@ async function onSearch(event) {
 
     createGallery(data.hits);
 
-    if (data.totalHits > data.hits.length) {
+    if (totalHits > data.hits.length) {
       showLoadMoreButton();
     }
   } catch (error) {
@@ -79,20 +79,22 @@ async function onSearch(event) {
 
 async function onLoadMore() {
   currentPage += 1;
-  showLoader();
+  showLoader('bottom');
 
   try {
     const data = await getImagesByQuery(currentQuery, currentPage);
     createGallery(data.hits);
 
-    const { height: cardHeight } = document
-      .querySelector('.gallery')
-      .firstElementChild.getBoundingClientRect();
+    const galleryEl = document.querySelector('.gallery');
+    if (galleryEl && galleryEl.firstElementChild) {
+      const { height: cardHeight } =
+        galleryEl.firstElementChild.getBoundingClientRect();
 
-    window.scrollBy({
-      top: cardHeight * 2,
-      behavior: 'smooth',
-    });
+      window.scrollBy({
+        top: cardHeight * 2,
+        behavior: 'smooth',
+      });
+    }
 
     const loadedImages = document.querySelectorAll('.gallery-item').length;
     if (loadedImages >= totalHits) {
